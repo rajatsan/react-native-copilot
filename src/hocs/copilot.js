@@ -99,6 +99,9 @@ const copilot = ({
       isLastStep = (): boolean => this.state.currentStep === this.getLastStep();
 
       registerStep = (step: Step): void => {
+        if (this.state.steps.hasOwnProperty(step.name)) {
+          return;
+        }
         this.setState(({ steps }) => ({
           steps: {
             ...steps,
@@ -156,7 +159,9 @@ const copilot = ({
       }
 
       async moveToCurrentStep(): void {
-        const size = await this.state.currentStep.target.measure();
+        let size;
+        if (this.state.currentStep.size) size = this.state.currentStep.size;
+        else size = await this.state.currentStep.target.measure();
 
         await this.modal.animateMove({
           width: size.width + OFFSET_WIDTH,
