@@ -159,15 +159,38 @@ const copilot = ({
       }
 
       async moveToCurrentStep(): void {
-        let size;
-        if (this.state.currentStep.size) size = this.state.currentStep.size;
-        else size = await this.state.currentStep.target.measure();
-
+        let size = await this.measure(this.state.currentStep.wrapper);
         await this.modal.animateMove({
           width: size.width + OFFSET_WIDTH,
           height: size.height + OFFSET_WIDTH,
           left: size.x - (OFFSET_WIDTH / 2),
           top: size.y - (OFFSET_WIDTH / 2),
+        });
+      }
+
+      measure(wrapper) {
+        if (typeof __TEST__ !== 'undefined' && __TEST__) { // eslint-disable-line no-undef
+          return new Promise(resolve => resolve({
+            x: 0, y: 0, width: 0, height: 0,
+          }));
+        }
+    
+        return new Promise((resolve, reject) => {
+          const measure = () => {
+            // Wait until the wrapper element appears
+            if (wrapper.measure) {
+              wrapper.measure(
+                (ox, oy, width, height, x, y) => resolve({
+                  x, y, width, height,
+                }),
+                reject,
+              );
+            } else {
+              requestAnimationFrame(measure);
+            }
+          };
+    
+          requestAnimationFrame(measure);
         });
       }
 
