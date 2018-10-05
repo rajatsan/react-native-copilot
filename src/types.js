@@ -5,12 +5,6 @@ export type Step = {
   visible: boolean,
   target: React$Element,
   wrapper: React$Element,
-  size: {
-    x: number,
-    y: number,
-    width: number,
-    height: number,
-  }
 };
 
 export type CopilotContext = {
